@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-500 to-cyan-400;
+  }
+
+  .bg-gradient-aurora {
+    @apply bg-gradient-to-r from-blue-700 via-blue-500 to-cyan-400;
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .card-3d-container {
+    transform-style: preserve-3d;
+  }
+}
+
+@theme {
+  --font-sans: var(--font-rubik);
+}
+
+:root {
+  --background: transparent;
+  --foreground: #0a0a0a;
+}

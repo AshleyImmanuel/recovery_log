@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  image     String?
+  createdAt DateTime @default(now())
+}
+
+model PaymentRequest {
+  id            String   @id @default(cuid())
+  userEmail     String
+  course        String
+  transactionId String
+  status        String   @default("pending")
+  createdAt     DateTime @default(now())
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  price       String
+  description String
+  milestones  Milestone[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  sales       Int      @default(0)
+}
+
+model Milestone {
+  id        String   @id @default(cuid())
+  title     String
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  videos    Video[]
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Video {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  videoId     String    // YouTube Video ID only
+  milestoneId String
+  milestone   Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+}
