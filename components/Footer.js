@@ -18,7 +18,7 @@ export default function Footer() {
                 </div>
 
                 {/* Social Links */}
-                <div className="flex items-center gap-6">
+                <div className="flex flex-wrap justify-center items-center gap-6">
                     <Link
                         href="https://wa.me/919037602265"
                         target="_blank"
