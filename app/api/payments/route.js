@@ -60,12 +60,29 @@ export async function GET(req) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const payments = await prisma.paymentRequest.findMany({
-      where: { userEmail: session.user.email },
-      orderBy: { createdAt: "desc" },
+    // Fetch payments and active courses in parallel
+    const [payments, courses] = await Promise.all([
+      prisma.paymentRequest.findMany({
+        where: { userEmail: session.user.email },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.course.findMany({
+        select: { title: true },
+      }),
+    ]);
+
+    // Create a Set of active course titles (normalized)
+    const activeCourseTitles = new Set(courses.map((c) => c.title.trim().toLowerCase()));
+
+    // Filter payments to only include those for active courses
+    const validPayments = payments.filter((payment) => {
+      // The payment.course field is formatted as "Course Name | WA: ..."
+      // We extract the course name part to check validity
+      const courseName = payment.course.split("|")[0].trim().toLowerCase();
+      return activeCourseTitles.has(courseName);
     });
 
-    return NextResponse.json(payments);
+    return NextResponse.json(validPayments);
   } catch (error) {
     console.error("Payment Fetch Error details:", error);
     return NextResponse.json({ error: "Error fetching payments", details: error.message, stack: error.stack }, { status: 500 });
